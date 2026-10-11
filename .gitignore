@@ -1,0 +1,81 @@
+# ── Python ────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.Python
+
+# ── Virtual Environment ───────────────────────────────────────
+venv/
+env/
+.env/
+.venv/
+
+# ── Environment Variables ─────────────────────────────────────
+.env
+.env.local
+.env.production
+
+# ── Data (raw datasets - too large for git) ───────────────────
+data/raw/
+data/processed/
+
+# ── Model Checkpoints (large binary files) ───────────────────
+checkpoints/
+*.pth
+*.pt
+*.ckpt
+*.pkl
+*.h5
+
+# ── Logs ──────────────────────────────────────────────────────
+logs/
+*.log
+runs/
+
+# ── TensorBoard ───────────────────────────────────────────────
+logs/tensorboard/
+
+# ── Results / plots (auto-generated) ─────────────────────────
+results/plots/
+results/reports/
+*.png
+*.pdf
+*.svg
+
+# ── Jupyter ───────────────────────────────────────────────────
+.ipynb_checkpoints
+*.ipynb
+
+# ── Backend uploads ───────────────────────────────────────────
+backend/uploads/
+*.db
+*.sqlite
+*.sqlite3
+
+# ── Frontend build ────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.next/
+
+# ── IDE ───────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Testing ───────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── Weights & Biases ─────────────────────────────────────────
+wandb/

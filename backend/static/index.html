@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DeepGuard AI — Deepfake & Media Verification Platform</title>
+  <meta name="description" content="AI-Powered Deepfake Detection using Hybrid CNN-Transformer architecture. Upload images and videos for real-time deepfake analysis with confidence scoring and artifact detection." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🛡️</text></svg>" />
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+
+  <!-- Ambient Background Orbs -->
+  <div class="ambient-bg">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <div class="app-container">
+    <!-- ═══ NAVBAR ═══════════════════════════════════════════════ -->
+    <nav class="navbar">
+      <div class="navbar-brand">
+        <div class="navbar-logo">🛡️</div>
+        <div>
+          <div class="navbar-title">DeepGuard AI</div>
+          <div class="navbar-subtitle">Media Verification Platform</div>
+        </div>
+      </div>
+
+      <div class="nav-links">
+        <button class="nav-link active" data-tab="analyze">🔍 Analyze</button>
+        <button class="nav-link" data-tab="history">📋 History</button>
+        <button class="nav-link" data-tab="dashboard">📊 Dashboard</button>
+      </div>
+
+      <div class="navbar-status">
+        <div id="status-badge" class="status-badge offline">
+          <span class="status-dot"></span> Checking...
+        </div>
+      </div>
+    </nav>
+
+    <!-- ═══ TAB: ANALYZE ════════════════════════════════════════ -->
+    <div id="tab-analyze" class="tab-content active">
+
+      <div class="section-header">
+        <h1 class="section-title">Analyze Media</h1>
+        <p class="section-desc">Upload an image or video to detect deepfake manipulation using our Hybrid CNN-Transformer model</p>
+      </div>
+
+      <!-- Upload Zones -->
+      <div class="upload-section">
+        <!-- Image Upload -->
+        <div id="image-upload-zone" class="upload-zone">
+          <div class="upload-icon">🖼️</div>
+          <div class="upload-title">Upload Image</div>
+          <div class="upload-subtitle">Drag & drop or click to browse</div>
+          <div class="upload-formats">
+            <span class="format-tag">JPG</span>
+            <span class="format-tag">PNG</span>
+            <span class="format-tag">BMP</span>
+            <span class="format-tag">WEBP</span>
+          </div>
+          <input type="file" id="image-input" accept="image/*" />
+          <div id="image-preview" style="display:none;"></div>
+        </div>
+
+        <!-- Video Upload -->
+        <div id="video-upload-zone" class="upload-zone">
+          <div class="upload-icon">🎬</div>
+          <div class="upload-title">Upload Video</div>
+          <div class="upload-subtitle">Drag & drop or click to browse</div>
+          <div class="upload-formats">
+            <span class="format-tag">MP4</span>
+            <span class="format-tag">AVI</span>
+            <span class="format-tag">MOV</span>
+            <span class="format-tag">MKV</span>
+          </div>
+          <input type="file" id="video-input" accept="video/*" />
+          <div id="video-preview" style="display:none;"></div>
+        </div>
+      </div>
+
+      <!-- Analyze Button -->
+      <div class="analyze-btn-container">
+        <button id="analyze-btn" class="analyze-btn" disabled>🔍 Analyze Media</button>
+      </div>
+
+      <!-- ═══ RESULTS ═══════════════════════════════════════════ -->
+      <div id="results-section" class="results-section">
+        <div class="section-header">
+          <h2 class="section-title">Analysis Results</h2>
+        </div>
+
+        <div class="results-grid">
+          <!-- Left: Verdict Card -->
+          <div>
+            <div id="verdict-card" class="card verdict-card">
+              <div class="verdict-glow"></div>
+              <div class="verdict-label">Detection Verdict</div>
+              <div id="verdict-result" class="verdict-result">—</div>
+
+              <!-- Confidence Ring -->
+              <div class="confidence-ring-container">
+                <svg class="confidence-ring" viewBox="0 0 160 160">
+                  <circle class="confidence-ring-bg" cx="80" cy="80" r="72" />
+                  <circle id="confidence-ring-fill" class="confidence-ring-fill" cx="80" cy="80" r="72"
+                    style="stroke-dasharray: 452.39; stroke-dashoffset: 452.39;" />
+                </svg>
+                <div class="confidence-value">
+                  <div id="confidence-number" class="confidence-number">0</div>
+                  <div class="confidence-unit">% confidence</div>
+                </div>
+              </div>
+
+              <!-- Probability Bars -->
+              <div class="probability-bars">
+                <div class="prob-row">
+                  <span class="prob-label real">REAL</span>
+                  <div class="prob-bar-track">
+                    <div id="prob-real-fill" class="prob-bar-fill real" style="width: 0%"></div>
+                  </div>
+                  <span id="prob-real-value" class="prob-value">0%</span>
+                </div>
+                <div class="prob-row">
+                  <span class="prob-label fake">FAKE</span>
+                  <div class="prob-bar-track">
+                    <div id="prob-fake-fill" class="prob-bar-fill fake" style="width: 0%"></div>
+                  </div>
+                  <span id="prob-fake-value" class="prob-value">0%</span>
+                </div>
+              </div>
+
+              <!-- Meta -->
+              <div class="meta-info-grid">
+                <div class="meta-item">
+                  <div id="meta-time" class="meta-value">—</div>
+                  <div class="meta-label">Inference Time</div>
+                </div>
+                <div class="meta-item">
+                  <div id="meta-type" class="meta-value">—</div>
+                  <div class="meta-label">Media Type</div>
+                </div>
+                <div class="meta-item">
+                  <div id="meta-id" class="meta-value">—</div>
+                  <div class="meta-label">Record ID</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Details -->
+          <div>
+            <!-- Artifact Scores (Image) -->
+            <div id="artifact-section" class="card" style="display:none; margin-bottom:20px;">
+              <div class="card-header">
+                <div class="card-title">
+                  <span class="card-title-icon">🔬</span> Artifact Analysis
+                </div>
+              </div>
+              <div id="artifact-grid" class="artifact-grid"></div>
+            </div>
+
+            <!-- Video Results -->
+            <div id="video-results-section" style="display:none;">
+              <div class="card" style="margin-bottom:20px;">
+                <div class="card-header">
+                  <div class="card-title">
+                    <span class="card-title-icon">📊</span> Frame-Level Analysis
+                  </div>
+                </div>
+                <div class="frame-scores-chart">
+                  <canvas id="frame-scores-canvas" class="frame-scores-canvas"></canvas>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <span class="card-title-icon">🎬</span> Video Statistics
+                  </div>
+                </div>
+                <div class="video-stats">
+                  <div class="video-stat-item">
+                    <div id="video-total-frames" class="video-stat-value">0</div>
+                    <div class="video-stat-label">Total Frames</div>
+                  </div>
+                  <div class="video-stat-item">
+                    <div id="video-suspicious" class="video-stat-value">0</div>
+                    <div class="video-stat-label">Suspicious</div>
+                  </div>
+                  <div class="video-stat-item">
+                    <div id="video-time" class="video-stat-value">—</div>
+                    <div class="video-stat-label">Process Time</div>
+                  </div>
+                  <div class="video-stat-item">
+                    <div id="video-avg-score" class="video-stat-value">—</div>
+                    <div class="video-stat-label">Avg Score</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: HISTORY ════════════════════════════════════════ -->
+    <div id="tab-history" class="tab-content">
+      <div class="section-header">
+        <h2 class="section-title">Analysis History</h2>
+        <p class="section-desc">Review past analysis records and their detection results</p>
+      </div>
+      <div id="history-content">
+        <div class="empty-state">
+          <div class="empty-state-icon">📋</div>
+          <div class="empty-state-text">Loading history...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: DASHBOARD ══════════════════════════════════════ -->
+    <div id="tab-dashboard" class="tab-content">
+      <div class="section-header">
+        <h2 class="section-title">Platform Dashboard</h2>
+        <p class="section-desc">Model performance, training metrics, and architecture overview</p>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="dashboard-grid">
+        <div class="stat-card cyan">
+          <div class="stat-card-header">
+            <div class="stat-card-icon">📊</div>
+            <div class="stat-card-label">Total Analyses</div>
+          </div>
+          <div id="stat-total" class="stat-card-value">0</div>
+          <div class="stat-card-sub">All-time scans</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-card-header">
+            <div class="stat-card-icon">✅</div>
+            <div class="stat-card-label">Real Detected</div>
+          </div>
+          <div id="stat-real" class="stat-card-value">0</div>
+          <div class="stat-card-sub">Authentic media</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-card-header">
+            <div class="stat-card-icon">⚠️</div>
+            <div class="stat-card-label">Fakes Detected</div>
+          </div>
+          <div id="stat-fake" class="stat-card-value">0</div>
+          <div class="stat-card-sub">Manipulated media</div>
+        </div>
+      </div>
+
+      <!-- Model Architectures -->
+      <div class="section-header" style="margin-top:12px;">
+        <h3 class="section-title" style="font-size:18px;">Model Architectures</h3>
+        <p class="section-desc">Three models built and evaluated for deepfake detection</p>
+      </div>
+      <div id="model-cards" class="model-cards-grid"></div>
+
+      <!-- Training Performance -->
+      <div class="card" style="margin-bottom:28px;">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-title-icon">📈</span> Training Performance (20 Epochs)
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);">
+            Best AUC: <span style="color:var(--accent-cyan);font-weight:700;font-family:'JetBrains Mono',monospace;">0.9986</span> &nbsp;|&nbsp;
+            Best Acc: <span style="color:var(--accent-purple);font-weight:700;font-family:'JetBrains Mono',monospace;">96.67%</span>
+          </div>
+        </div>
+        <div class="training-chart-container">
+          <canvas id="training-chart-canvas" class="training-chart-canvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Architecture Diagram -->
+      <div class="card" style="margin-bottom:28px;">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-title-icon">🏗️</span> Hybrid CNN–Transformer Architecture
+          </div>
+        </div>
+        <div class="architecture-flow">
+          <div class="arch-node input">📸 Input (Image / Video Frame)</div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-node input">🔲 Face Detection & Crop</div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-node cnn">🧠 EfficientNet-B4 CNN Feature Extractor</div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-node cnn">📐 Spatial Feature Map → Token Sequence</div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-node transformer">⚡ Multi-Head Self-Attention Transformer Encoder (×4 layers)</div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-node transformer">🎯 [CLS] Token + Positional Encoding</div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-node output">✅ Classification Head → REAL / DEEPFAKE + Confidence</div>
+        </div>
+      </div>
+
+      <!-- Tech Specs -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-title-icon">⚙️</span> Technical Specifications
+          </div>
+        </div>
+        <div class="dashboard-grid" style="margin-bottom:0;">
+          <div class="stat-card amber" style="margin-bottom:0;">
+            <div class="stat-card-label">CNN Backbone</div>
+            <div class="stat-card-value" style="font-size:18px;">EfficientNet-B4</div>
+            <div class="stat-card-sub">17.5M parameters</div>
+          </div>
+          <div class="stat-card cyan" style="margin-bottom:0;">
+            <div class="stat-card-label">Transformer</div>
+            <div class="stat-card-value" style="font-size:18px;">4×512 dim</div>
+            <div class="stat-card-sub">8-head attention, 4 layers</div>
+          </div>
+          <div class="stat-card green" style="margin-bottom:0;">
+            <div class="stat-card-label">Training</div>
+            <div class="stat-card-value" style="font-size:18px;">20 Epochs</div>
+            <div class="stat-card-sub">AdamW, CosineAnnealing LR</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ FOOTER ══════════════════════════════════════════════ -->
+    <footer class="footer">
+      <p class="footer-text">
+        Built with 🧠 by <span class="footer-brand">DeepGuard AI</span> — 
+        Hybrid CNN–Transformer Deepfake Detection Platform &nbsp;·&nbsp; 4th Year Research Project
+      </p>
+    </footer>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+# ============================================================
+# Deepfake Detection Platform - Master Configuration
+# ============================================================
+
+# ── Project ──────────────────────────────────────────────────
+project:
+  name: "DeepfakeDetector"
+  version: "1.0.0"
+  description: "Hybrid CNN-Transformer Deepfake Detection"
+  root_dir: "."
+  seed: 42
+
+# ── Data ─────────────────────────────────────────────────────
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  splits_dir: "data/splits"
+
+  # Image settings
+  image_size: 224          # Input size for all models
+  face_margin: 0.3         # Extra margin around detected face (fraction)
+  min_face_size: 40        # Minimum face size in pixels to consider
+
+  # Video settings
+  frames_per_video: 32     # Frames to sample per video
+  frame_sample_strategy: "uniform"  # uniform | keyframe | random
+  video_extensions: [".mp4", ".avi", ".mov", ".mkv"]
+  image_extensions: [".jpg", ".jpeg", ".png", ".bmp", ".tiff"]
+
+  # Dataset splits
+  train_ratio: 0.70
+  val_ratio:   0.15
+  test_ratio:  0.15
+
+  # Normalization (ImageNet stats)
+  mean: [0.485, 0.456, 0.406]
+  std:  [0.229, 0.224, 0.225]
+
+  # Augmentation strength: 'light' | 'medium' | 'heavy'
+  augmentation_strength: "medium"
+
+# ── Model ─────────────────────────────────────────────────────
+model:
+  # CNN backbone options: efficientnet_b4 | efficientnet_b0 | mobilenet_v2 | xception
+  cnn_backbone: "efficientnet_b4"
+  pretrained: true
+  dropout_rate: 0.4
+  num_classes: 2            # 0=real, 1=fake
+
+  # Transformer settings
+  transformer:
+    embed_dim: 512
+    num_heads: 8
+    num_layers: 4
+    mlp_ratio: 4.0
+    dropout: 0.1
+    max_seq_len: 32         # Max frames for temporal transformer
+
+  # Hybrid model
+  hybrid:
+    cnn_features_dim: 512   # Output dim from CNN
+    use_temporal: true      # Enable temporal transformer for video
+
+# ── Training ─────────────────────────────────────────────────
+training:
+  # General
+  batch_size: 16
+  num_epochs: 50
+  num_workers: 4
+  pin_memory: true
+
+  # Optimizer
+  optimizer: "adamw"        # adam | adamw | sgd
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  momentum: 0.9             # For SGD only
+
+  # Scheduler
+  scheduler: "cosine"       # cosine | step | plateau | onecycle
+  warmup_epochs: 5
+  min_lr: 1.0e-6
+  step_size: 10             # For StepLR
+  gamma: 0.1                # For StepLR
+  patience: 7               # For ReduceLROnPlateau
+
+  # Early stopping
+  early_stopping: true
+  early_stopping_patience: 12
+  early_stopping_metric: "val_auc"
+  early_stopping_mode: "max"
+
+  # Mixed precision
+  use_amp: true             # Automatic Mixed Precision
+
+  # Gradient clipping
+  grad_clip: 1.0
+
+  # Class weights for imbalanced datasets
+  use_class_weights: true
+
+  # Checkpointing
+  checkpoint_dir: "checkpoints"
+  save_every_n_epochs: 5
+  keep_top_k: 3
+
+# ── Evaluation ───────────────────────────────────────────────
+evaluation:
+  batch_size: 32
+  threshold: 0.5            # Classification threshold
+  num_workers: 4
+  results_dir: "results"
+
+# ── Inference ────────────────────────────────────────────────
+inference:
+  model_path: "checkpoints/hybrid/best_model.pth"
+  device: "auto"            # auto | cuda | cpu
+  batch_size: 8
+  video_frames: 32
+  confidence_threshold: 0.5
+  face_detector: "mediapipe"  # mediapipe | dlib | opencv_dnn
+
+# ── Explainability ───────────────────────────────────────────
+explainability:
+  method: "gradcam"         # gradcam | gradcam++ | scorecam
+  target_layer: "auto"      # auto-detect last conv layer
+  output_dir: "results/explanations"
+  alpha: 0.5                # Heatmap overlay transparency
+
+# ── Backend ──────────────────────────────────────────────────
+backend:
+  host: "0.0.0.0"
+  port: 8000
+  debug: false
+  max_upload_size_mb: 500
+  upload_dir: "backend/uploads"
+  database_url: "sqlite:///./deepfake_detector.db"
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://localhost:5173"
+
+# ── Logging ──────────────────────────────────────────────────
+logging:
+  log_dir: "logs"
+  level: "INFO"             # DEBUG | INFO | WARNING | ERROR
+  use_tensorboard: true
+  tensorboard_dir: "logs/tensorboard"
+  use_wandb: false          # Set true to enable Weights & Biases
+  wandb_project: "deepfake-detection"

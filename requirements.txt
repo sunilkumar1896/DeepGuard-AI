@@ -1,0 +1,74 @@
+# ============================================================
+# AI-Powered Deepfake & Media Verification Platform
+# Requirements File
+# ============================================================
+
+# ── Core Deep Learning ──────────────────────────────────────
+torch>=2.1.0
+torchvision>=0.16.0
+torchaudio>=2.1.0
+
+# ── Computer Vision ─────────────────────────────────────────
+opencv-python>=4.8.0
+opencv-contrib-python>=4.8.0
+Pillow>=10.0.0
+albumentations>=1.3.1
+imageio>=2.31.0
+imageio-ffmpeg>=0.4.9
+
+# ── Face Detection ───────────────────────────────────────────
+facenet-pytorch>=2.5.3
+mediapipe>=0.10.7
+dlib>=19.24.2
+insightface>=0.7.3
+
+# ── ML / Data Science ────────────────────────────────────────
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+scipy>=1.11.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+tqdm>=4.65.0
+
+# ── Explainability ───────────────────────────────────────────
+grad-cam>=1.4.8
+
+# ── Training / Logging ──────────────────────────────────────
+tensorboard>=2.14.0
+wandb>=0.16.0
+timm>=0.9.7
+
+# ── Video Processing ─────────────────────────────────────────
+decord>=0.6.0
+ffmpeg-python>=0.2.0
+
+# ── Backend ──────────────────────────────────────────────────
+fastapi>=0.103.0
+uvicorn[standard]>=0.23.0
+python-multipart>=0.0.6
+aiofiles>=23.2.1
+httpx>=0.25.0
+
+# ── Database ─────────────────────────────────────────────────
+sqlalchemy>=2.0.0
+alembic>=1.12.0
+
+# ── Utilities ────────────────────────────────────────────────
+python-dotenv>=1.0.0
+pydantic>=2.4.0
+pydantic-settings>=2.0.3
+PyYAML>=6.0
+rich>=13.6.0
+click>=8.1.7
+colorama>=0.4.6
+psutil>=5.9.6
+einops>=0.7.0
+
+# ── Development ──────────────────────────────────────────────
+pytest>=7.4.0
+black>=23.9.1
+flake8>=6.1.0
+isort>=5.12.0
+jupyter>=1.0.0
+ipywidgets>=8.1.1
