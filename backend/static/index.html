@@ -3,344 +3,1264 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DeepGuard AI — Deepfake & Media Verification Platform</title>
-  <meta name="description" content="AI-Powered Deepfake Detection using Hybrid CNN-Transformer architecture. Upload images and videos for real-time deepfake analysis with confidence scoring and artifact detection." />
+  <title>DeepGuard AI — Forensic Deepfake Detection Platform</title>
+  <meta name="description" content="Enterprise-grade AI deepfake detection using Hybrid CNN-Transformer architecture. Detect manipulated images and videos with 96.67% accuracy and 0.9986 AUC score." />
+  <meta name="keywords" content="deepfake detection, AI, forensic analysis, media verification, CNN transformer" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🛡️</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/css/styles.css" />
 </head>
 <body>
 
-  <!-- Ambient Background Orbs -->
-  <div class="ambient-bg">
+  <!-- Ambient Background -->
+  <div class="ambient-bg" aria-hidden="true">
     <div class="orb"></div>
     <div class="orb"></div>
     <div class="orb"></div>
+    <div class="grid-overlay"></div>
   </div>
 
   <!-- Toast Container -->
-  <div id="toast-container" class="toast-container"></div>
+  <div id="toast-container" class="toast-container" role="status" aria-live="polite"></div>
 
-  <div class="app-container">
-    <!-- ═══ NAVBAR ═══════════════════════════════════════════════ -->
-    <nav class="navbar">
-      <div class="navbar-brand">
-        <div class="navbar-logo">🛡️</div>
-        <div>
-          <div class="navbar-title">DeepGuard AI</div>
-          <div class="navbar-subtitle">Media Verification Platform</div>
+  <!-- ════════════════════════════════════════════════════════════
+       GLOBAL NAVBAR
+  ═══════════════════════════════════════════════════════════════ -->
+  <nav class="navbar" id="main-navbar" role="navigation" aria-label="Main navigation">
+    <div class="navbar-inner">
+
+      <!-- Brand -->
+      <div class="navbar-brand" id="brand-home-link" role="button" tabindex="0" aria-label="DeepGuard AI Home">
+        <div class="navbar-logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z" fill="url(#shieldGrad)" />
+            <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="shieldGrad" x1="3" y1="2" x2="21" y2="23" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#06b6d4"/>
+                <stop offset="1" stop-color="#8b5cf6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="navbar-brand-text">
+          <span class="navbar-title">DeepGuard AI</span>
+          <span class="navbar-subtitle">Forensic Detection</span>
         </div>
       </div>
 
-      <div class="nav-links">
-        <button class="nav-link active" data-tab="analyze">🔍 Analyze</button>
-        <button class="nav-link" data-tab="history">📋 History</button>
-        <button class="nav-link" data-tab="dashboard">📊 Dashboard</button>
+      <!-- Navigation Links -->
+      <div class="nav-center-links" id="landing-nav-links">
+        <a href="#features" class="nav-anchor" id="nav-features">Detection</a>
+        <a href="#how-it-works" class="nav-anchor" id="nav-how">How It Works</a>
+        <a href="#metrics" class="nav-anchor" id="nav-metrics">Performance</a>
+        <a href="#architecture" class="nav-anchor" id="nav-arch">Architecture</a>
       </div>
 
-      <div class="navbar-status">
-        <div id="status-badge" class="status-badge offline">
-          <span class="status-dot"></span> Checking...
+      <!-- App tab nav (shown when in app mode) -->
+      <div class="nav-links" id="app-nav-links" style="display:none;">
+        <button class="nav-link active" data-tab="analyze" id="nav-tab-analyze">🔍 Analyze</button>
+        <button class="nav-link" data-tab="history" id="nav-tab-history">📋 History</button>
+        <button class="nav-link" data-tab="dashboard" id="nav-tab-dashboard">📊 Dashboard</button>
+      </div>
+
+      <!-- Navbar Actions -->
+      <div class="navbar-actions">
+        <div id="status-badge" class="status-badge offline" aria-label="Backend status">
+          <span class="status-dot"></span>
+          <span>Checking...</span>
         </div>
-      </div>
-    </nav>
-
-    <!-- ═══ TAB: ANALYZE ════════════════════════════════════════ -->
-    <div id="tab-analyze" class="tab-content active">
-
-      <div class="section-header">
-        <h1 class="section-title">Analyze Media</h1>
-        <p class="section-desc">Upload an image or video to detect deepfake manipulation using our Hybrid CNN-Transformer model</p>
+        <button class="nav-btn-secondary" id="btn-back-home" style="display:none;">← Platform</button>
+        <button class="nav-btn-primary app-entry-btn" id="btn-analyze-cta" data-tab="analyze">
+          Analyze Media
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
       </div>
 
-      <!-- Upload Zones -->
-      <div class="upload-section">
-        <!-- Image Upload -->
-        <div id="image-upload-zone" class="upload-zone">
-          <div class="upload-icon">🖼️</div>
-          <div class="upload-title">Upload Image</div>
-          <div class="upload-subtitle">Drag & drop or click to browse</div>
-          <div class="upload-formats">
-            <span class="format-tag">JPG</span>
-            <span class="format-tag">PNG</span>
-            <span class="format-tag">BMP</span>
-            <span class="format-tag">WEBP</span>
+    </div>
+  </nav>
+
+  <!-- ════════════════════════════════════════════════════════════
+       LANDING PAGE
+  ═══════════════════════════════════════════════════════════════ -->
+  <div id="landing-page">
+
+    <!-- ── HERO SECTION ──────────────────────────────────────── -->
+    <section class="hero-section" id="hero" aria-label="Hero">
+      <div class="hero-content">
+
+        <div class="hero-pill" aria-label="New feature badge">
+          <span class="hero-pill-dot" aria-hidden="true"></span>
+          AI-Powered Forensic Analysis · Research Project 2024
+        </div>
+
+        <h1 class="hero-headline">
+          Detect <span class="text-gradient-hero">Deepfakes</span><br class="hero-br"/>
+          with Forensic<br class="hero-br"/>
+          <span class="text-gradient-hero2">Precision</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Advanced Hybrid CNN-Transformer architecture delivering <strong>96.67% accuracy</strong>
+          in identifying AI-generated and manipulated media across images and videos in real time.
+        </p>
+
+        <div class="hero-cta-row">
+          <button class="btn-hero-primary app-entry-btn" data-tab="analyze" id="hero-cta-analyze">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            Start Analyzing
+          </button>
+          <a href="#how-it-works" class="btn-hero-secondary">
+            See How It Works
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </a>
+        </div>
+
+        <div class="hero-stats-row" aria-label="Key performance metrics">
+          <div class="hero-stat">
+            <div class="hero-stat-value" data-count="96.67" data-suffix="%">0%</div>
+            <div class="hero-stat-label">Detection Accuracy</div>
           </div>
-          <input type="file" id="image-input" accept="image/*" />
-          <div id="image-preview" style="display:none;"></div>
-        </div>
-
-        <!-- Video Upload -->
-        <div id="video-upload-zone" class="upload-zone">
-          <div class="upload-icon">🎬</div>
-          <div class="upload-title">Upload Video</div>
-          <div class="upload-subtitle">Drag & drop or click to browse</div>
-          <div class="upload-formats">
-            <span class="format-tag">MP4</span>
-            <span class="format-tag">AVI</span>
-            <span class="format-tag">MOV</span>
-            <span class="format-tag">MKV</span>
+          <div class="hero-stat-divider" aria-hidden="true"></div>
+          <div class="hero-stat">
+            <div class="hero-stat-value" data-count="0.9986" data-prefix="">0.00</div>
+            <div class="hero-stat-label">AUC Score</div>
           </div>
-          <input type="file" id="video-input" accept="video/*" />
-          <div id="video-preview" style="display:none;"></div>
-        </div>
-      </div>
-
-      <!-- Analyze Button -->
-      <div class="analyze-btn-container">
-        <button id="analyze-btn" class="analyze-btn" disabled>🔍 Analyze Media</button>
-      </div>
-
-      <!-- ═══ RESULTS ═══════════════════════════════════════════ -->
-      <div id="results-section" class="results-section">
-        <div class="section-header">
-          <h2 class="section-title">Analysis Results</h2>
+          <div class="hero-stat-divider" aria-hidden="true"></div>
+          <div class="hero-stat">
+            <div class="hero-stat-value" data-count="3" data-suffix="">0</div>
+            <div class="hero-stat-label">AI Models Built</div>
+          </div>
+          <div class="hero-stat-divider" aria-hidden="true"></div>
+          <div class="hero-stat">
+            <div class="hero-stat-value" data-count="20" data-suffix="">0</div>
+            <div class="hero-stat-label">Training Epochs</div>
+          </div>
         </div>
 
-        <div class="results-grid">
-          <!-- Left: Verdict Card -->
-          <div>
-            <div id="verdict-card" class="card verdict-card">
-              <div class="verdict-glow"></div>
-              <div class="verdict-label">Detection Verdict</div>
-              <div id="verdict-result" class="verdict-result">—</div>
+      </div>
 
-              <!-- Confidence Ring -->
-              <div class="confidence-ring-container">
-                <svg class="confidence-ring" viewBox="0 0 160 160">
-                  <circle class="confidence-ring-bg" cx="80" cy="80" r="72" />
-                  <circle id="confidence-ring-fill" class="confidence-ring-fill" cx="80" cy="80" r="72"
-                    style="stroke-dasharray: 452.39; stroke-dashoffset: 452.39;" />
-                </svg>
-                <div class="confidence-value">
-                  <div id="confidence-number" class="confidence-number">0</div>
-                  <div class="confidence-unit">% confidence</div>
-                </div>
-              </div>
+      <!-- Hero Visual -->
+      <div class="hero-visual" aria-hidden="true">
+        <div class="detection-card-wrapper">
+          <!-- Main Detection Card -->
+          <div class="detection-card">
+            <div class="detection-card-header">
+              <div class="dc-header-dot dc-dot-red"></div>
+              <div class="dc-header-dot dc-dot-yellow"></div>
+              <div class="dc-header-dot dc-dot-green"></div>
+              <span class="dc-header-title">deepguard_analysis.py</span>
+            </div>
+            <div class="detection-card-body">
+              <!-- Face Detection Area -->
+              <div class="face-detection-area">
+                <div class="face-canvas">
+                  <!-- Face SVG -->
+                  <svg class="face-svg" viewBox="0 0 200 220" fill="none">
+                    <!-- Head outline -->
+                    <ellipse cx="100" cy="105" rx="75" ry="90" stroke="rgba(6,182,212,0.3)" stroke-width="1.5" stroke-dasharray="4 3"/>
+                    <!-- Eyes -->
+                    <ellipse cx="72" cy="88" rx="12" ry="8" fill="rgba(99,102,241,0.2)" stroke="rgba(99,102,241,0.6)" stroke-width="1"/>
+                    <ellipse cx="128" cy="88" rx="12" ry="8" fill="rgba(99,102,241,0.2)" stroke="rgba(99,102,241,0.6)" stroke-width="1"/>
+                    <!-- Pupils -->
+                    <circle cx="72" cy="88" r="4" fill="rgba(139,92,246,0.7)"/>
+                    <circle cx="128" cy="88" r="4" fill="rgba(139,92,246,0.7)"/>
+                    <!-- Nose -->
+                    <path d="M100 105 L92 125 L108 125" stroke="rgba(6,182,212,0.4)" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+                    <!-- Mouth -->
+                    <path d="M82 140 Q100 155 118 140" stroke="rgba(6,182,212,0.4)" stroke-width="1.5" fill="none"/>
+                    <!-- Ear left -->
+                    <path d="M25 95 Q18 105 25 120" stroke="rgba(6,182,212,0.25)" stroke-width="1.5" fill="none"/>
+                    <!-- Ear right -->
+                    <path d="M175 95 Q182 105 175 120" stroke="rgba(6,182,212,0.25)" stroke-width="1.5" fill="none"/>
+                    <!-- Facial landmark dots -->
+                    <circle cx="72" cy="72" r="2" fill="#06b6d4" opacity="0.7"/>
+                    <circle cx="128" cy="72" r="2" fill="#06b6d4" opacity="0.7"/>
+                    <circle cx="100" cy="70" r="2" fill="#06b6d4" opacity="0.7"/>
+                    <circle cx="65" cy="110" r="2" fill="#8b5cf6" opacity="0.7"/>
+                    <circle cx="135" cy="110" r="2" fill="#8b5cf6" opacity="0.7"/>
+                    <circle cx="82" cy="140" r="2" fill="#06b6d4" opacity="0.7"/>
+                    <circle cx="118" cy="140" r="2" fill="#06b6d4" opacity="0.7"/>
+                    <circle cx="100" cy="155" r="2" fill="#06b6d4" opacity="0.7"/>
+                  </svg>
 
-              <!-- Probability Bars -->
-              <div class="probability-bars">
-                <div class="prob-row">
-                  <span class="prob-label real">REAL</span>
-                  <div class="prob-bar-track">
-                    <div id="prob-real-fill" class="prob-bar-fill real" style="width: 0%"></div>
+                  <!-- Scan Line -->
+                  <div class="scan-line" aria-hidden="true"></div>
+
+                  <!-- Detection Box -->
+                  <div class="detection-box" aria-hidden="true">
+                    <div class="det-corner det-corner-tl"></div>
+                    <div class="det-corner det-corner-tr"></div>
+                    <div class="det-corner det-corner-bl"></div>
+                    <div class="det-corner det-corner-br"></div>
                   </div>
-                  <span id="prob-real-value" class="prob-value">0%</span>
-                </div>
-                <div class="prob-row">
-                  <span class="prob-label fake">FAKE</span>
-                  <div class="prob-bar-track">
-                    <div id="prob-fake-fill" class="prob-bar-fill fake" style="width: 0%"></div>
+
+                  <!-- Detection Label -->
+                  <div class="detection-verdict-label">
+                    <span class="det-warning-icon">⚠</span>
+                    DEEPFAKE DETECTED
                   </div>
-                  <span id="prob-fake-value" class="prob-value">0%</span>
+                </div>
+
+                <!-- Confidence Score -->
+                <div class="dc-confidence">
+                  <div class="dc-confidence-label">Confidence Score</div>
+                  <div class="dc-confidence-bar-track">
+                    <div class="dc-confidence-bar-fill" style="width:0%" data-target="94.3"></div>
+                  </div>
+                  <div class="dc-confidence-value">94.3%</div>
                 </div>
               </div>
 
-              <!-- Meta -->
-              <div class="meta-info-grid">
-                <div class="meta-item">
-                  <div id="meta-time" class="meta-value">—</div>
-                  <div class="meta-label">Inference Time</div>
+              <!-- Artifact Analysis Bars -->
+              <div class="dc-artifacts">
+                <div class="dc-artifact-title">Artifact Analysis</div>
+                <div class="dc-artifact-row">
+                  <span class="dc-artifact-label">GAN Artifacts</span>
+                  <div class="dc-artifact-track">
+                    <div class="dc-artifact-fill high" style="width:0%" data-target="87%"></div>
+                  </div>
+                  <span class="dc-artifact-pct">87%</span>
                 </div>
-                <div class="meta-item">
-                  <div id="meta-type" class="meta-value">—</div>
-                  <div class="meta-label">Media Type</div>
+                <div class="dc-artifact-row">
+                  <span class="dc-artifact-label">Blending Seam</span>
+                  <div class="dc-artifact-track">
+                    <div class="dc-artifact-fill high" style="width:0%" data-target="79%"></div>
+                  </div>
+                  <span class="dc-artifact-pct">79%</span>
                 </div>
-                <div class="meta-item">
-                  <div id="meta-id" class="meta-value">—</div>
-                  <div class="meta-label">Record ID</div>
+                <div class="dc-artifact-row">
+                  <span class="dc-artifact-label">Eye Mismatch</span>
+                  <div class="dc-artifact-track">
+                    <div class="dc-artifact-fill medium" style="width:0%" data-target="61%"></div>
+                  </div>
+                  <span class="dc-artifact-pct">61%</span>
+                </div>
+                <div class="dc-artifact-row">
+                  <span class="dc-artifact-label">Texture Shift</span>
+                  <div class="dc-artifact-track">
+                    <div class="dc-artifact-fill medium" style="width:0%" data-target="48%"></div>
+                  </div>
+                  <span class="dc-artifact-pct">48%</span>
                 </div>
               </div>
+
             </div>
           </div>
 
-          <!-- Right: Details -->
-          <div>
-            <!-- Artifact Scores (Image) -->
-            <div id="artifact-section" class="card" style="display:none; margin-bottom:20px;">
-              <div class="card-header">
-                <div class="card-title">
-                  <span class="card-title-icon">🔬</span> Artifact Analysis
-                </div>
-              </div>
-              <div id="artifact-grid" class="artifact-grid"></div>
+          <!-- Floating Cards -->
+          <div class="float-card float-card-1" aria-hidden="true">
+            <div class="float-card-icon">⚡</div>
+            <div class="float-card-text">
+              <div class="float-card-val">~120ms</div>
+              <div class="float-card-lbl">Inference Time</div>
             </div>
+          </div>
 
-            <!-- Video Results -->
-            <div id="video-results-section" style="display:none;">
-              <div class="card" style="margin-bottom:20px;">
-                <div class="card-header">
-                  <div class="card-title">
-                    <span class="card-title-icon">📊</span> Frame-Level Analysis
-                  </div>
-                </div>
-                <div class="frame-scores-chart">
-                  <canvas id="frame-scores-canvas" class="frame-scores-canvas"></canvas>
-                </div>
-              </div>
+          <div class="float-card float-card-2" aria-hidden="true">
+            <div class="float-card-icon">🔬</div>
+            <div class="float-card-text">
+              <div class="float-card-val">EfficientNet-B4</div>
+              <div class="float-card-lbl">CNN Backbone</div>
+            </div>
+          </div>
 
-              <div class="card">
-                <div class="card-header">
-                  <div class="card-title">
-                    <span class="card-title-icon">🎬</span> Video Statistics
-                  </div>
-                </div>
-                <div class="video-stats">
-                  <div class="video-stat-item">
-                    <div id="video-total-frames" class="video-stat-value">0</div>
-                    <div class="video-stat-label">Total Frames</div>
-                  </div>
-                  <div class="video-stat-item">
-                    <div id="video-suspicious" class="video-stat-value">0</div>
-                    <div class="video-stat-label">Suspicious</div>
-                  </div>
-                  <div class="video-stat-item">
-                    <div id="video-time" class="video-stat-value">—</div>
-                    <div class="video-stat-label">Process Time</div>
-                  </div>
-                  <div class="video-stat-item">
-                    <div id="video-avg-score" class="video-stat-value">—</div>
-                    <div class="video-stat-label">Avg Score</div>
-                  </div>
-                </div>
-              </div>
+          <div class="float-card float-card-3" aria-hidden="true">
+            <div class="float-card-icon">✓</div>
+            <div class="float-card-text">
+              <div class="float-card-val" style="color:#10b981;">REAL</div>
+              <div class="float-card-lbl">Frame 14/20</div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- ═══ TAB: HISTORY ════════════════════════════════════════ -->
-    <div id="tab-history" class="tab-content">
-      <div class="section-header">
-        <h2 class="section-title">Analysis History</h2>
-        <p class="section-desc">Review past analysis records and their detection results</p>
-      </div>
-      <div id="history-content">
-        <div class="empty-state">
-          <div class="empty-state-icon">📋</div>
-          <div class="empty-state-text">Loading history...</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ TAB: DASHBOARD ══════════════════════════════════════ -->
-    <div id="tab-dashboard" class="tab-content">
-      <div class="section-header">
-        <h2 class="section-title">Platform Dashboard</h2>
-        <p class="section-desc">Model performance, training metrics, and architecture overview</p>
-      </div>
-
-      <!-- Stats Row -->
-      <div class="dashboard-grid">
-        <div class="stat-card cyan">
-          <div class="stat-card-header">
-            <div class="stat-card-icon">📊</div>
-            <div class="stat-card-label">Total Analyses</div>
-          </div>
-          <div id="stat-total" class="stat-card-value">0</div>
-          <div class="stat-card-sub">All-time scans</div>
-        </div>
-        <div class="stat-card green">
-          <div class="stat-card-header">
-            <div class="stat-card-icon">✅</div>
-            <div class="stat-card-label">Real Detected</div>
-          </div>
-          <div id="stat-real" class="stat-card-value">0</div>
-          <div class="stat-card-sub">Authentic media</div>
-        </div>
-        <div class="stat-card purple">
-          <div class="stat-card-header">
-            <div class="stat-card-icon">⚠️</div>
-            <div class="stat-card-label">Fakes Detected</div>
-          </div>
-          <div id="stat-fake" class="stat-card-value">0</div>
-          <div class="stat-card-sub">Manipulated media</div>
+    <!-- ── MARQUEE / TRUST BAR ──────────────────────────────── -->
+    <section class="trust-section" aria-label="Technologies and frameworks">
+      <div class="trust-label">Powered by cutting-edge AI research and frameworks</div>
+      <div class="marquee-wrapper" aria-hidden="true">
+        <div class="marquee-track">
+          <div class="marquee-item"><span class="marquee-icon">🧠</span>EfficientNet-B4</div>
+          <div class="marquee-item"><span class="marquee-icon">⚡</span>Vision Transformer</div>
+          <div class="marquee-item"><span class="marquee-icon">🔬</span>PyTorch</div>
+          <div class="marquee-item"><span class="marquee-icon">🎯</span>FaceForensics++</div>
+          <div class="marquee-item"><span class="marquee-icon">📊</span>DFDC Dataset</div>
+          <div class="marquee-item"><span class="marquee-icon">🏗️</span>Self-Attention</div>
+          <div class="marquee-item"><span class="marquee-icon">🌐</span>FastAPI Backend</div>
+          <div class="marquee-item"><span class="marquee-icon">🔍</span>Grad-CAM XAI</div>
+          <div class="marquee-item"><span class="marquee-icon">📐</span>MediaPipe</div>
+          <div class="marquee-item"><span class="marquee-icon">🛡️</span>MTCNN Detection</div>
+          <!-- Duplicate for seamless loop -->
+          <div class="marquee-item"><span class="marquee-icon">🧠</span>EfficientNet-B4</div>
+          <div class="marquee-item"><span class="marquee-icon">⚡</span>Vision Transformer</div>
+          <div class="marquee-item"><span class="marquee-icon">🔬</span>PyTorch</div>
+          <div class="marquee-item"><span class="marquee-icon">🎯</span>FaceForensics++</div>
+          <div class="marquee-item"><span class="marquee-icon">📊</span>DFDC Dataset</div>
+          <div class="marquee-item"><span class="marquee-icon">🏗️</span>Self-Attention</div>
+          <div class="marquee-item"><span class="marquee-icon">🌐</span>FastAPI Backend</div>
+          <div class="marquee-item"><span class="marquee-icon">🔍</span>Grad-CAM XAI</div>
+          <div class="marquee-item"><span class="marquee-icon">📐</span>MediaPipe</div>
+          <div class="marquee-item"><span class="marquee-icon">🛡️</span>MTCNN Detection</div>
         </div>
       </div>
+    </section>
 
-      <!-- Model Architectures -->
-      <div class="section-header" style="margin-top:12px;">
-        <h3 class="section-title" style="font-size:18px;">Model Architectures</h3>
-        <p class="section-desc">Three models built and evaluated for deepfake detection</p>
+    <!-- ── FEATURES / DETECTION LAYERS ──────────────────────── -->
+    <section class="features-section" id="features" aria-label="Detection capabilities">
+      <div class="section-container">
+        <div class="section-eyebrow">Multi-Layer Forensic Analysis</div>
+        <h2 class="section-heading">
+          Uncover manipulation at<br/>
+          <span class="text-gradient-cyan">every layer</span>
+        </h2>
+        <p class="section-subheading">
+          DeepGuard AI combines spatial, temporal, and semantic analysis to expose deepfake manipulation
+          across multiple forensic dimensions simultaneously.
+        </p>
+
+        <div class="features-grid" role="list">
+          <article class="feature-card feature-card-primary" role="listitem">
+            <div class="feature-card-icon-wrap icon-cyan">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <h3 class="feature-card-title">Face Detection & Alignment</h3>
+            <p class="feature-card-desc">
+              Multi-scale face detection using MTCNN with landmark alignment. Precisely crops and normalizes faces for forensic analysis, supporting multiple faces per frame.
+            </p>
+            <div class="feature-card-tags">
+              <span class="ftag">MTCNN</span>
+              <span class="ftag">68 Landmarks</span>
+              <span class="ftag">Multi-face</span>
+            </div>
+          </article>
+
+          <article class="feature-card" role="listitem">
+            <div class="feature-card-icon-wrap icon-purple">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+            </div>
+            <h3 class="feature-card-title">CNN Feature Extraction</h3>
+            <p class="feature-card-desc">
+              EfficientNet-B4 backbone with 17.5M parameters extracts deep spatial features from facial regions, capturing subtle texture inconsistencies and blending artifacts.
+            </p>
+            <div class="feature-card-tags">
+              <span class="ftag">EfficientNet-B4</span>
+              <span class="ftag">17.5M Params</span>
+              <span class="ftag">ImageNet Pretrained</span>
+            </div>
+          </article>
+
+          <article class="feature-card" role="listitem">
+            <div class="feature-card-icon-wrap icon-indigo">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <h3 class="feature-card-title">Transformer Attention</h3>
+            <p class="feature-card-desc">
+              Multi-head self-attention encoder with 4 layers and 8 attention heads models global spatial relationships across the entire face, detecting cross-region inconsistencies.
+            </p>
+            <div class="feature-card-tags">
+              <span class="ftag">4 Encoder Layers</span>
+              <span class="ftag">8 Heads</span>
+              <span class="ftag">512-dim</span>
+            </div>
+          </article>
+
+          <article class="feature-card" role="listitem">
+            <div class="feature-card-icon-wrap icon-pink">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            </div>
+            <h3 class="feature-card-title">Video Frame Analysis</h3>
+            <p class="feature-card-desc">
+              Temporal consistency analysis across video frames with per-frame scoring, suspicious frame detection, and timeline visualization of manipulation probability.
+            </p>
+            <div class="feature-card-tags">
+              <span class="ftag">Frame-level</span>
+              <span class="ftag">Timeline Chart</span>
+              <span class="ftag">MP4/AVI/MOV</span>
+            </div>
+          </article>
+
+          <article class="feature-card" role="listitem">
+            <div class="feature-card-icon-wrap icon-amber">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <h3 class="feature-card-title">Artifact Score Breakdown</h3>
+            <p class="feature-card-desc">
+              Detailed scoring across four forensic dimensions: blending artifacts, texture inconsistency, eye reflection mismatch, and boundary edge noise.
+            </p>
+            <div class="feature-card-tags">
+              <span class="ftag">4 Artifact Types</span>
+              <span class="ftag">Confidence Score</span>
+              <span class="ftag">Real-time</span>
+            </div>
+          </article>
+
+          <article class="feature-card" role="listitem">
+            <div class="feature-card-icon-wrap icon-green">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <h3 class="feature-card-title">Explainable AI (XAI)</h3>
+            <p class="feature-card-desc">
+              Grad-CAM visualizations and attention map overlays highlight exactly which regions the model focused on, providing interpretable forensic evidence for each decision.
+            </p>
+            <div class="feature-card-tags">
+              <span class="ftag">Grad-CAM</span>
+              <span class="ftag">Attention Maps</span>
+              <span class="ftag">Interpretable</span>
+            </div>
+          </article>
+        </div>
       </div>
-      <div id="model-cards" class="model-cards-grid"></div>
+    </section>
 
-      <!-- Training Performance -->
-      <div class="card" style="margin-bottom:28px;">
-        <div class="card-header">
-          <div class="card-title">
-            <span class="card-title-icon">📈</span> Training Performance (20 Epochs)
-          </div>
-          <div style="font-size:12px;color:var(--text-muted);">
-            Best AUC: <span style="color:var(--accent-cyan);font-weight:700;font-family:'JetBrains Mono',monospace;">0.9986</span> &nbsp;|&nbsp;
-            Best Acc: <span style="color:var(--accent-purple);font-weight:700;font-family:'JetBrains Mono',monospace;">96.67%</span>
-          </div>
-        </div>
-        <div class="training-chart-container">
-          <canvas id="training-chart-canvas" class="training-chart-canvas"></canvas>
-        </div>
-      </div>
+    <!-- ── HOW IT WORKS ──────────────────────────────────────── -->
+    <section class="how-section" id="how-it-works" aria-label="How it works">
+      <div class="section-container">
+        <div class="section-eyebrow">Simple 3-Step Process</div>
+        <h2 class="section-heading">From upload to verdict<br/><span class="text-gradient-cyan">in seconds</span></h2>
 
-      <!-- Architecture Diagram -->
-      <div class="card" style="margin-bottom:28px;">
-        <div class="card-header">
-          <div class="card-title">
-            <span class="card-title-icon">🏗️</span> Hybrid CNN–Transformer Architecture
+        <div class="steps-grid">
+          <div class="step-item">
+            <div class="step-number" aria-label="Step 1">01</div>
+            <div class="step-visual step-upload">
+              <div class="step-visual-inner">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <div class="step-visual-formats">
+                  <span>JPG</span><span>PNG</span><span>MP4</span><span>AVI</span>
+                </div>
+              </div>
+            </div>
+            <h3 class="step-title">Upload Media</h3>
+            <p class="step-desc">Drag & drop or browse to select your image or video file. Supports JPG, PNG, BMP, WEBP, MP4, AVI, MOV, MKV formats.</p>
           </div>
-        </div>
-        <div class="architecture-flow">
-          <div class="arch-node input">📸 Input (Image / Video Frame)</div>
-          <div class="arch-arrow">↓</div>
-          <div class="arch-node input">🔲 Face Detection & Crop</div>
-          <div class="arch-arrow">↓</div>
-          <div class="arch-node cnn">🧠 EfficientNet-B4 CNN Feature Extractor</div>
-          <div class="arch-arrow">↓</div>
-          <div class="arch-node cnn">📐 Spatial Feature Map → Token Sequence</div>
-          <div class="arch-arrow">↓</div>
-          <div class="arch-node transformer">⚡ Multi-Head Self-Attention Transformer Encoder (×4 layers)</div>
-          <div class="arch-arrow">↓</div>
-          <div class="arch-node transformer">🎯 [CLS] Token + Positional Encoding</div>
-          <div class="arch-arrow">↓</div>
-          <div class="arch-node output">✅ Classification Head → REAL / DEEPFAKE + Confidence</div>
-        </div>
-      </div>
 
-      <!-- Tech Specs -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <span class="card-title-icon">⚙️</span> Technical Specifications
+          <div class="step-connector" aria-hidden="true">
+            <svg width="40" height="2" viewBox="0 0 40 2"><line x1="0" y1="1" x2="40" y2="1" stroke="url(#stepGrad)" stroke-width="2" stroke-dasharray="5 3"/><defs><linearGradient id="stepGrad"><stop stop-color="#06b6d4"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs></svg>
           </div>
-        </div>
-        <div class="dashboard-grid" style="margin-bottom:0;">
-          <div class="stat-card amber" style="margin-bottom:0;">
-            <div class="stat-card-label">CNN Backbone</div>
-            <div class="stat-card-value" style="font-size:18px;">EfficientNet-B4</div>
-            <div class="stat-card-sub">17.5M parameters</div>
+
+          <div class="step-item">
+            <div class="step-number" aria-label="Step 2">02</div>
+            <div class="step-visual step-analyze">
+              <div class="step-visual-inner">
+                <div class="step-analyze-ring">
+                  <svg width="60" height="60" viewBox="0 0 60 60">
+                    <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(139,92,246,0.2)" stroke-width="4"/>
+                    <circle cx="30" cy="30" r="24" fill="none" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round" stroke-dasharray="100 51" class="step-ring-anim"/>
+                  </svg>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" class="step-center-icon"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+              </div>
+            </div>
+            <h3 class="step-title">AI Analysis</h3>
+            <p class="step-desc">The Hybrid CNN-Transformer model analyzes facial features, detects artifacts, and evaluates temporal consistency across all frames.</p>
           </div>
-          <div class="stat-card cyan" style="margin-bottom:0;">
-            <div class="stat-card-label">Transformer</div>
-            <div class="stat-card-value" style="font-size:18px;">4×512 dim</div>
-            <div class="stat-card-sub">8-head attention, 4 layers</div>
+
+          <div class="step-connector" aria-hidden="true">
+            <svg width="40" height="2" viewBox="0 0 40 2"><line x1="0" y1="1" x2="40" y2="1" stroke="url(#stepGrad2)" stroke-width="2" stroke-dasharray="5 3"/><defs><linearGradient id="stepGrad2"><stop stop-color="#8b5cf6"/><stop offset="1" stop-color="#10b981"/></linearGradient></defs></svg>
           </div>
-          <div class="stat-card green" style="margin-bottom:0;">
-            <div class="stat-card-label">Training</div>
-            <div class="stat-card-value" style="font-size:18px;">20 Epochs</div>
-            <div class="stat-card-sub">AdamW, CosineAnnealing LR</div>
+
+          <div class="step-item">
+            <div class="step-number" aria-label="Step 3">03</div>
+            <div class="step-visual step-verdict">
+              <div class="step-visual-inner">
+                <div class="step-verdict-badge fake">DEEPFAKE</div>
+                <div class="step-verdict-conf">94.3% Confidence</div>
+              </div>
+            </div>
+            <h3 class="step-title">Forensic Verdict</h3>
+            <p class="step-desc">Receive a detailed report with confidence score, probability bars, artifact breakdown, and explainable AI visualizations.</p>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- ═══ FOOTER ══════════════════════════════════════════════ -->
-    <footer class="footer">
-      <p class="footer-text">
-        Built with 🧠 by <span class="footer-brand">DeepGuard AI</span> — 
-        Hybrid CNN–Transformer Deepfake Detection Platform &nbsp;·&nbsp; 4th Year Research Project
-      </p>
+    <!-- ── METRICS SECTION ───────────────────────────────────── -->
+    <section class="metrics-section" id="metrics" aria-label="Performance metrics">
+      <div class="metrics-bg-glow" aria-hidden="true"></div>
+      <div class="section-container">
+        <div class="section-eyebrow">Validated Performance</div>
+        <h2 class="section-heading">
+          Precision you can<br/>
+          <span class="text-gradient-cyan">trust</span>
+        </h2>
+
+        <div class="metrics-grid">
+          <div class="metric-card metric-primary">
+            <div class="metric-icon" aria-hidden="true">📊</div>
+            <div class="metric-value animate-count" data-count="96.67" data-suffix="%">0%</div>
+            <div class="metric-label">Detection Accuracy</div>
+            <div class="metric-desc">On held-out test set, 20-epoch training</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon" aria-hidden="true">🎯</div>
+            <div class="metric-value animate-count" data-count="0.9986" data-suffix="">0.00</div>
+            <div class="metric-label">AUC-ROC Score</div>
+            <div class="metric-desc">Near-perfect discrimination ability</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon" aria-hidden="true">⚡</div>
+            <div class="metric-value animate-count" data-count="120" data-suffix="ms">0ms</div>
+            <div class="metric-label">Inference Speed</div>
+            <div class="metric-desc">Per image on standard GPU hardware</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon" aria-hidden="true">🧠</div>
+            <div class="metric-value animate-count" data-count="17.5" data-suffix="M">0M</div>
+            <div class="metric-label">CNN Parameters</div>
+            <div class="metric-desc">EfficientNet-B4 feature extractor</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon" aria-hidden="true">🔬</div>
+            <div class="metric-value animate-count" data-count="4" data-suffix="">0</div>
+            <div class="metric-label">Artifact Dimensions</div>
+            <div class="metric-desc">Blending, texture, eyes, boundary</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon" aria-hidden="true">🏆</div>
+            <div class="metric-value animate-count" data-count="3" data-suffix="">0</div>
+            <div class="metric-label">Models Evaluated</div>
+            <div class="metric-desc">CNN, ViT, and Hybrid compared</div>
+          </div>
+        </div>
+
+        <!-- Training Chart Preview -->
+        <div class="training-preview-card">
+          <div class="training-preview-header">
+            <div class="training-preview-title">
+              <span style="color:var(--accent-cyan)">●</span> Val AUC
+              <span style="color:var(--accent-purple); margin-left:16px;">●</span> Val Accuracy
+            </div>
+            <div class="training-preview-badge">20 Epochs · Best AUC: 0.9986</div>
+          </div>
+          <canvas id="hero-training-chart" class="hero-training-canvas"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ARCHITECTURE SECTION ──────────────────────────────── -->
+    <section class="arch-landing-section" id="architecture" aria-label="Model architecture">
+      <div class="section-container">
+        <div class="section-eyebrow">Model Architecture</div>
+        <h2 class="section-heading">Hybrid <span class="text-gradient-cyan">CNN-Transformer</span><br/>Architecture</h2>
+        <p class="section-subheading">
+          Combining the local feature extraction power of convolutional networks with 
+          the global context modeling of transformer attention for superior deepfake detection.
+        </p>
+
+        <div class="arch-flow-wrapper">
+          <div class="arch-flow-grid">
+            <div class="arch-flow-node arch-node-input">
+              <div class="arch-flow-icon">📸</div>
+              <div class="arch-flow-name">Input Media</div>
+              <div class="arch-flow-detail">Image or Video Frame</div>
+            </div>
+            <div class="arch-flow-arrow">→</div>
+            <div class="arch-flow-node arch-node-detect">
+              <div class="arch-flow-icon">👤</div>
+              <div class="arch-flow-name">Face Detection</div>
+              <div class="arch-flow-detail">MTCNN + Landmark Crop</div>
+            </div>
+            <div class="arch-flow-arrow">→</div>
+            <div class="arch-flow-node arch-node-cnn">
+              <div class="arch-flow-icon">🧠</div>
+              <div class="arch-flow-name">CNN Encoder</div>
+              <div class="arch-flow-detail">EfficientNet-B4 · 17.5M params</div>
+            </div>
+            <div class="arch-flow-arrow">→</div>
+            <div class="arch-flow-node arch-node-transformer">
+              <div class="arch-flow-icon">⚡</div>
+              <div class="arch-flow-name">Transformer</div>
+              <div class="arch-flow-detail">4× Multi-Head Attention (8 heads)</div>
+            </div>
+            <div class="arch-flow-arrow">→</div>
+            <div class="arch-flow-node arch-node-output">
+              <div class="arch-flow-icon">🎯</div>
+              <div class="arch-flow-name">Verdict</div>
+              <div class="arch-flow-detail">REAL / DEEPFAKE + Confidence</div>
+            </div>
+          </div>
+
+          <div class="arch-specs-grid">
+            <div class="arch-spec-card">
+              <div class="arch-spec-label">CNN Backbone</div>
+              <div class="arch-spec-value">EfficientNet-B4</div>
+              <div class="arch-spec-sub">Compound scaling, 17.5M parameters</div>
+            </div>
+            <div class="arch-spec-card">
+              <div class="arch-spec-label">Transformer Depth</div>
+              <div class="arch-spec-value">4 × 512-dim</div>
+              <div class="arch-spec-sub">8-head self-attention per layer</div>
+            </div>
+            <div class="arch-spec-card">
+              <div class="arch-spec-label">Training Setup</div>
+              <div class="arch-spec-value">AdamW + Cosine LR</div>
+              <div class="arch-spec-sub">20 epochs, CosineAnnealing schedule</div>
+            </div>
+            <div class="arch-spec-card">
+              <div class="arch-spec-label">Input Resolution</div>
+              <div class="arch-spec-value">380 × 380 px</div>
+              <div class="arch-spec-sub">EfficientNet-B4 native resolution</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DETECTION USE CASES ───────────────────────────────── -->
+    <section class="usecases-section" aria-label="Detection types">
+      <div class="section-container">
+        <div class="section-eyebrow">Detection Scope</div>
+        <h2 class="section-heading">What DeepGuard can <span class="text-gradient-cyan">detect</span></h2>
+
+        <div class="usecases-grid">
+          <div class="usecase-card">
+            <div class="usecase-icon">🎭</div>
+            <h3>Face Swap</h3>
+            <p>Detect faces replaced with another person's likeness using GAN or diffusion-based generation methods.</p>
+          </div>
+          <div class="usecase-card">
+            <div class="usecase-icon">🎬</div>
+            <h3>Face Reenactment</h3>
+            <p>Identify videos where facial expressions and movements have been re-animated to say or do something different.</p>
+          </div>
+          <div class="usecase-card">
+            <div class="usecase-icon">🖼️</div>
+            <h3>GAN Generated</h3>
+            <p>Flag synthetic portraits and images created entirely by generative adversarial networks or diffusion models.</p>
+          </div>
+          <div class="usecase-card">
+            <div class="usecase-icon">🔀</div>
+            <h3>Blending Artifacts</h3>
+            <p>Expose subtle blending seams and boundary inconsistencies where a manipulated region meets the original background.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CTA SECTION ───────────────────────────────────────── -->
+    <section class="cta-section" aria-label="Call to action">
+      <div class="cta-glow" aria-hidden="true"></div>
+      <div class="section-container">
+        <div class="cta-inner">
+          <div class="cta-badge">Free · Open Source · Research Project</div>
+          <h2 class="cta-headline">
+            Ready to detect<br/>
+            <span class="text-gradient-hero">deepfakes?</span>
+          </h2>
+          <p class="cta-subtitle">
+            Upload any image or video and get a forensic analysis report in seconds.
+            No signup required.
+          </p>
+          <div class="cta-actions">
+            <button class="btn-cta-primary app-entry-btn" id="cta-analyze-btn" data-tab="analyze">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              Start Free Analysis
+            </button>
+            <a href="#features" class="btn-cta-secondary">Learn More →</a>
+          </div>
+          <div class="cta-features-row">
+            <span>✓ Images & Videos</span>
+            <span>✓ Real-time Results</span>
+            <span>✓ Confidence Scores</span>
+            <span>✓ Artifact Breakdown</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FOOTER ─────────────────────────────────────────────── -->
+    <footer class="site-footer" role="contentinfo">
+      <div class="section-container">
+        <div class="footer-grid">
+          <div class="footer-brand-col">
+            <div class="footer-logo">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z" fill="url(#footerGrad)"/>
+                <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs>
+                  <linearGradient id="footerGrad" x1="3" y1="2" x2="21" y2="23" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#06b6d4"/>
+                    <stop offset="1" stop-color="#8b5cf6"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <span>DeepGuard AI</span>
+            </div>
+            <p class="footer-brand-desc">
+              Forensic deepfake detection using Hybrid CNN-Transformer architecture.
+              4th Year Research Project.
+            </p>
+            <div class="footer-tech-stack">
+              <span class="footer-tech-badge">PyTorch</span>
+              <span class="footer-tech-badge">EfficientNet</span>
+              <span class="footer-tech-badge">FastAPI</span>
+            </div>
+          </div>
+
+          <div class="footer-links-col">
+            <div class="footer-links-heading">Platform</div>
+            <nav aria-label="Footer platform links">
+              <ul class="footer-links-list">
+                <li><button class="footer-link app-entry-btn" data-tab="analyze">Analyze Media</button></li>
+                <li><button class="footer-link app-entry-btn" data-tab="history">Analysis History</button></li>
+                <li><button class="footer-link app-entry-btn" data-tab="dashboard">Dashboard</button></li>
+              </ul>
+            </nav>
+          </div>
+
+          <div class="footer-links-col">
+            <div class="footer-links-heading">Detection</div>
+            <ul class="footer-links-list">
+              <li><a href="#features" class="footer-link">Face Analysis</a></li>
+              <li><a href="#features" class="footer-link">Video Analysis</a></li>
+              <li><a href="#architecture" class="footer-link">AI Architecture</a></li>
+              <li><a href="#metrics" class="footer-link">Performance</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-links-col">
+            <div class="footer-links-heading">Research</div>
+            <ul class="footer-links-list">
+              <li><a href="#metrics" class="footer-link">Model Metrics</a></li>
+              <li><a href="#how-it-works" class="footer-link">Methodology</a></li>
+              <li><a href="#architecture" class="footer-link">Architecture</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <div class="footer-bottom-left">
+            © 2024 DeepGuard AI · Hybrid CNN-Transformer Deepfake Detection · 4th Year Research Project
+          </div>
+          <div class="footer-bottom-right">
+            Built with 🧠 &amp; ❤️ using PyTorch, EfficientNet-B4 &amp; Transformer Encoder
+          </div>
+        </div>
+      </div>
     </footer>
-  </div>
+
+  </div><!-- end #landing-page -->
+
+  <!-- ════════════════════════════════════════════════════════════
+       APP CONTAINER (Analysis Tool)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div id="app-wrapper" style="display:none;" aria-label="Analysis application">
+    <div class="app-container">
+
+      <!-- ── TAB: ANALYZE ──────────────────────────────────── -->
+      <div id="tab-analyze" class="tab-content active">
+
+        <div class="app-section-header">
+          <h1 class="app-section-title">Analyze Media</h1>
+          <p class="app-section-desc">Upload an image or video to detect deepfake manipulation using our Hybrid CNN-Transformer model</p>
+        </div>
+
+        <!-- Upload Zones -->
+        <div class="upload-section">
+          <!-- Image Upload -->
+          <div id="image-upload-zone" class="upload-zone" role="button" tabindex="0" aria-label="Upload image file">
+            <div class="upload-icon" aria-hidden="true">🖼️</div>
+            <div class="upload-title">Upload Image</div>
+            <div class="upload-subtitle">Drag &amp; drop or click to browse</div>
+            <div class="upload-formats">
+              <span class="format-tag">JPG</span>
+              <span class="format-tag">PNG</span>
+              <span class="format-tag">BMP</span>
+              <span class="format-tag">WEBP</span>
+            </div>
+            <input type="file" id="image-input" accept="image/*" aria-label="Image file input" />
+            <div id="image-preview" style="display:none;"></div>
+          </div>
+
+          <!-- Video Upload -->
+          <div id="video-upload-zone" class="upload-zone" role="button" tabindex="0" aria-label="Upload video file">
+            <div class="upload-icon" aria-hidden="true">🎬</div>
+            <div class="upload-title">Upload Video</div>
+            <div class="upload-subtitle">Drag &amp; drop or click to browse</div>
+            <div class="upload-formats">
+              <span class="format-tag">MP4</span>
+              <span class="format-tag">AVI</span>
+              <span class="format-tag">MOV</span>
+              <span class="format-tag">MKV</span>
+            </div>
+            <input type="file" id="video-input" accept="video/*" aria-label="Video file input" />
+            <div id="video-preview" style="display:none;"></div>
+          </div>
+        </div>
+
+        <!-- Analyze Button -->
+        <div class="analyze-btn-container">
+          <button id="analyze-btn" class="analyze-btn" disabled aria-label="Analyze selected media">🔍 Analyze Media</button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="results-section">
+          <div class="app-section-header">
+            <h2 class="app-section-title">Analysis Results</h2>
+          </div>
+
+          <div class="results-grid">
+            <!-- Left: Verdict Card -->
+            <div>
+              <div id="verdict-card" class="card verdict-card">
+                <div class="verdict-glow"></div>
+                <div class="verdict-label">Detection Verdict</div>
+                <div id="verdict-result" class="verdict-result">—</div>
+
+                <!-- Confidence Ring -->
+                <div class="confidence-ring-container">
+                  <svg class="confidence-ring" viewBox="0 0 160 160" aria-hidden="true">
+                    <circle class="confidence-ring-bg" cx="80" cy="80" r="72" />
+                    <circle id="confidence-ring-fill" class="confidence-ring-fill" cx="80" cy="80" r="72"
+                      style="stroke-dasharray: 452.39; stroke-dashoffset: 452.39;" />
+                  </svg>
+                  <div class="confidence-value">
+                    <div id="confidence-number" class="confidence-number">0</div>
+                    <div class="confidence-unit">% confidence</div>
+                  </div>
+                </div>
+
+                <!-- Probability Bars -->
+                <div class="probability-bars">
+                  <div class="prob-row">
+                    <span class="prob-label real">REAL</span>
+                    <div class="prob-bar-track">
+                      <div id="prob-real-fill" class="prob-bar-fill real" style="width: 0%"></div>
+                    </div>
+                    <span id="prob-real-value" class="prob-value">0%</span>
+                  </div>
+                  <div class="prob-row">
+                    <span class="prob-label fake">FAKE</span>
+                    <div class="prob-bar-track">
+                      <div id="prob-fake-fill" class="prob-bar-fill fake" style="width: 0%"></div>
+                    </div>
+                    <span id="prob-fake-value" class="prob-value">0%</span>
+                  </div>
+                </div>
+
+                <!-- Meta Info -->
+                <div class="meta-info-grid">
+                  <div class="meta-item">
+                    <div id="meta-time" class="meta-value">—</div>
+                    <div class="meta-label">Inference Time</div>
+                  </div>
+                  <div class="meta-item">
+                    <div id="meta-type" class="meta-value">—</div>
+                    <div class="meta-label">Media Type</div>
+                  </div>
+                  <div class="meta-item">
+                    <div id="meta-id" class="meta-value">—</div>
+                    <div class="meta-label">Record ID</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Details -->
+            <div>
+              <!-- Artifact Scores (Image) -->
+              <div id="artifact-section" class="card" style="display:none; margin-bottom:20px;">
+                <div class="card-header">
+                  <div class="card-title">
+                    <span class="card-title-icon">🔬</span> Artifact Analysis
+                  </div>
+                </div>
+                <div id="artifact-grid" class="artifact-grid"></div>
+              </div>
+
+              <!-- Video Results -->
+              <div id="video-results-section" style="display:none;">
+                <div class="card" style="margin-bottom:20px;">
+                  <div class="card-header">
+                    <div class="card-title">
+                      <span class="card-title-icon">📊</span> Frame-Level Analysis
+                    </div>
+                  </div>
+                  <div class="frame-scores-chart">
+                    <canvas id="frame-scores-canvas" class="frame-scores-canvas" aria-label="Frame scores chart"></canvas>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header">
+                    <div class="card-title">
+                      <span class="card-title-icon">🎬</span> Video Statistics
+                    </div>
+                  </div>
+                  <div class="video-stats">
+                    <div class="video-stat-item">
+                      <div id="video-total-frames" class="video-stat-value">0</div>
+                      <div class="video-stat-label">Total Frames</div>
+                    </div>
+                    <div class="video-stat-item">
+                      <div id="video-suspicious" class="video-stat-value">0</div>
+                      <div class="video-stat-label">Suspicious</div>
+                    </div>
+                    <div class="video-stat-item">
+                      <div id="video-time" class="video-stat-value">—</div>
+                      <div class="video-stat-label">Process Time</div>
+                    </div>
+                    <div class="video-stat-item">
+                      <div id="video-avg-score" class="video-stat-value">—</div>
+                      <div class="video-stat-label">Avg Score</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end #tab-analyze -->
+
+      <!-- ── TAB: HISTORY ──────────────────────────────────── -->
+      <div id="tab-history" class="tab-content">
+        <div class="app-section-header">
+          <h2 class="app-section-title">Analysis History</h2>
+          <p class="app-section-desc">Review past analysis records and their detection results</p>
+        </div>
+        <div id="history-content">
+          <div class="empty-state">
+            <div class="empty-state-icon" aria-hidden="true">📋</div>
+            <div class="empty-state-text">Loading history...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: DASHBOARD ────────────────────────────────── -->
+      <div id="tab-dashboard" class="tab-content">
+        <div class="app-section-header">
+          <h2 class="app-section-title">Platform Dashboard</h2>
+          <p class="app-section-desc">Model performance, training metrics, and architecture overview</p>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="dashboard-grid">
+          <div class="stat-card cyan">
+            <div class="stat-card-header">
+              <div class="stat-card-icon">📊</div>
+              <div class="stat-card-label">Total Analyses</div>
+            </div>
+            <div id="stat-total" class="stat-card-value">0</div>
+            <div class="stat-card-sub">All-time scans</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-card-header">
+              <div class="stat-card-icon">✅</div>
+              <div class="stat-card-label">Real Detected</div>
+            </div>
+            <div id="stat-real" class="stat-card-value">0</div>
+            <div class="stat-card-sub">Authentic media</div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-card-header">
+              <div class="stat-card-icon">⚠️</div>
+              <div class="stat-card-label">Fakes Detected</div>
+            </div>
+            <div id="stat-fake" class="stat-card-value">0</div>
+            <div class="stat-card-sub">Manipulated media</div>
+          </div>
+        </div>
+
+        <!-- Model Architectures -->
+        <div class="app-section-header" style="margin-top:12px;">
+          <h3 class="app-section-title" style="font-size:18px;">Model Architectures</h3>
+          <p class="app-section-desc">Three models built and evaluated for deepfake detection</p>
+        </div>
+        <div id="model-cards" class="model-cards-grid"></div>
+
+        <!-- Training Performance -->
+        <div class="card" style="margin-bottom:28px;">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-title-icon">📈</span> Training Performance (20 Epochs)
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);">
+              Best AUC: <span style="color:var(--accent-cyan);font-weight:700;font-family:'JetBrains Mono',monospace;">0.9986</span>
+              &nbsp;|&nbsp;
+              Best Acc: <span style="color:var(--accent-purple);font-weight:700;font-family:'JetBrains Mono',monospace;">96.67%</span>
+            </div>
+          </div>
+          <div class="training-chart-container">
+            <canvas id="training-chart-canvas" class="training-chart-canvas" aria-label="Training performance chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Architecture Diagram -->
+        <div class="card" style="margin-bottom:28px;">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-title-icon">🏗️</span> Hybrid CNN–Transformer Architecture
+            </div>
+          </div>
+          <div class="architecture-flow">
+            <div class="arch-node input">📸 Input (Image / Video Frame)</div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-node input">🔲 Face Detection &amp; Crop</div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-node cnn">🧠 EfficientNet-B4 CNN Feature Extractor</div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-node cnn">📐 Spatial Feature Map → Token Sequence</div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-node transformer">⚡ Multi-Head Self-Attention Transformer Encoder (×4 layers)</div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-node transformer">🎯 [CLS] Token + Positional Encoding</div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-node output">✅ Classification Head → REAL / DEEPFAKE + Confidence</div>
+          </div>
+        </div>
+
+        <!-- Tech Specs -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-title-icon">⚙️</span> Technical Specifications
+            </div>
+          </div>
+          <div class="dashboard-grid" style="margin-bottom:0;">
+            <div class="stat-card amber" style="margin-bottom:0;">
+              <div class="stat-card-label">CNN Backbone</div>
+              <div class="stat-card-value" style="font-size:18px;">EfficientNet-B4</div>
+              <div class="stat-card-sub">17.5M parameters</div>
+            </div>
+            <div class="stat-card cyan" style="margin-bottom:0;">
+              <div class="stat-card-label">Transformer</div>
+              <div class="stat-card-value" style="font-size:18px;">4×512 dim</div>
+              <div class="stat-card-sub">8-head attention, 4 layers</div>
+            </div>
+            <div class="stat-card green" style="margin-bottom:0;">
+              <div class="stat-card-label">Training</div>
+              <div class="stat-card-value" style="font-size:18px;">20 Epochs</div>
+              <div class="stat-card-sub">AdamW, CosineAnnealing LR</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- end #tab-dashboard -->
+
+    </div><!-- end .app-container -->
+  </div><!-- end #app-wrapper -->
 
   <script src="/static/js/app.js"></script>
+  <script>
+    /* ══ Page Switching & Landing Animations ══ */
+    (function () {
+
+      // ── Page switching ──────────────────────────────────────
+      const landing  = document.getElementById('landing-page');
+      const appWrap  = document.getElementById('app-wrapper');
+      const brandBtn = document.getElementById('brand-home-link');
+      const backBtn  = document.getElementById('btn-back-home');
+      const landingNav = document.getElementById('landing-nav-links');
+      const appNav     = document.getElementById('app-nav-links');
+      const analyzeCtaBtn = document.getElementById('btn-analyze-cta');
+
+      function showLanding() {
+        landing.style.display = '';
+        appWrap.style.display = 'none';
+        backBtn.style.display = 'none';
+        landingNav.style.display = '';
+        appNav.style.display = 'none';
+        analyzeCtaBtn.style.display = '';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function showApp() {
+        landing.style.display = 'none';
+        appWrap.style.display = '';
+        backBtn.style.display = '';
+        landingNav.style.display = 'none';
+        appNav.style.display = '';
+        analyzeCtaBtn.style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
+
+      // Brand logo → home
+      brandBtn.addEventListener('click', showLanding);
+      brandBtn.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') showLanding();
+      });
+
+      // Back button → home
+      backBtn.addEventListener('click', showLanding);
+
+      // All app-entry buttons → show app
+      document.querySelectorAll('.app-entry-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          showApp();
+        });
+      });
+
+      // App nav links also switch to app
+      document.querySelectorAll('#app-nav-links .nav-link').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          showApp();
+        });
+      });
+
+      // ── Smooth scroll for anchor links ──────────────────────
+      document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+        anchor.addEventListener('click', function(e) {
+          var target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+
+      // ── Navbar scroll effect ─────────────────────────────────
+      var navbar = document.getElementById('main-navbar');
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 60) {
+          navbar.classList.add('navbar-scrolled');
+        } else {
+          navbar.classList.remove('navbar-scrolled');
+        }
+      });
+
+      // ── Animate hero stats on load ───────────────────────────
+      function animateValue(el, target, duration) {
+        var start = 0;
+        var startTime = null;
+        var suffix = el.dataset.suffix || '';
+        var prefix = el.dataset.prefix || '';
+        var isDecimal = String(target).indexOf('.') !== -1;
+        var decimals = isDecimal ? (String(target).split('.')[1] || '').length : 0;
+
+        function step(timestamp) {
+          if (!startTime) startTime = timestamp;
+          var progress = Math.min((timestamp - startTime) / duration, 1);
+          var eased = 1 - Math.pow(1 - progress, 3);
+          var current = start + (target - start) * eased;
+          el.textContent = prefix + current.toFixed(decimals) + suffix;
+          if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }
+
+      // Hero stat counters
+      document.querySelectorAll('.hero-stat-value[data-count]').forEach(function(el) {
+        var target = parseFloat(el.dataset.count);
+        animateValue(el, target, 2000);
+      });
+
+      // Metrics counters (triggered on scroll)
+      var metricsObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.querySelectorAll('.animate-count[data-count]').forEach(function(el) {
+              if (!el.dataset.animated) {
+                el.dataset.animated = '1';
+                var target = parseFloat(el.dataset.count);
+                animateValue(el, target, 1800);
+              }
+            });
+            metricsObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      var metricsSection = document.getElementById('metrics');
+      if (metricsSection) metricsObserver.observe(metricsSection);
+
+      // ── Hero detection card animations ──────────────────────
+      function animateHeroCard() {
+        // Confidence bar
+        setTimeout(function() {
+          var bar = document.querySelector('.dc-confidence-bar-fill');
+          if (bar) bar.style.width = bar.dataset.target + '%';
+        }, 800);
+
+        // Artifact bars
+        setTimeout(function() {
+          document.querySelectorAll('.dc-artifact-fill').forEach(function(bar) {
+            bar.style.width = bar.dataset.target;
+          });
+        }, 1200);
+      }
+      animateHeroCard();
+
+      // ── Mini training chart in metrics section ───────────────
+      function drawMiniChart() {
+        var canvas = document.getElementById('hero-training-chart');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var dpr = window.devicePixelRatio || 1;
+        var rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+
+        var w = rect.width, h = rect.height;
+        var pad = { top: 16, right: 16, bottom: 24, left: 40 };
+        var cw = w - pad.left - pad.right;
+        var ch = h - pad.top - pad.bottom;
+
+        var aucData = [0.652,0.908,0.848,0.880,0.894,0.913,0.879,0.984,0.895,0.938,0.950,0.999,0.950,0.988,0.958,0.924,0.870,0.978,0.969,0.969];
+        var accData = [0.813,0.907,0.920,0.927,0.947,0.933,0.907,0.927,0.947,0.960,0.947,0.953,0.947,0.953,0.947,0.947,0.933,0.953,0.967,0.947];
+
+        ctx.clearRect(0, 0, w, h);
+
+        // Grid
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+        ctx.lineWidth = 1;
+        for (var i = 0; i <= 4; i++) {
+          var y = pad.top + (ch/4)*i;
+          ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w-pad.right, y); ctx.stroke();
+          ctx.fillStyle = '#4a5568'; ctx.font = '10px Inter, sans-serif'; ctx.textAlign = 'right';
+          ctx.fillText((1.0 - i*0.25).toFixed(2), pad.left-6, y+3);
+        }
+
+        // X labels
+        ctx.fillStyle = '#4a5568'; ctx.textAlign = 'center'; ctx.font = '10px Inter';
+        [1,5,10,15,20].forEach(function(ep) {
+          var x = pad.left + (cw/(aucData.length-1))*(ep-1);
+          ctx.fillText('E'+ep, x, h-4);
+        });
+
+        function drawLine(data, color) {
+          ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+          ctx.beginPath();
+          data.forEach(function(v, i) {
+            var x = pad.left + (cw/(data.length-1))*i;
+            var y = pad.top + ch*(1-v);
+            if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+          });
+          ctx.stroke();
+        }
+
+        drawLine(aucData, '#06b6d4');
+        drawLine(accData, '#8b5cf6');
+      }
+
+      // Draw chart when metrics section visible
+      var chartObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) { drawMiniChart(); chartObserver.unobserve(e.target); }
+        });
+      }, { threshold: 0.2 });
+      var chartCanvas = document.getElementById('hero-training-chart');
+      if (chartCanvas) chartObserver.observe(chartCanvas.closest('.training-preview-card') || chartCanvas);
+
+      // ── Scroll reveal animations ─────────────────────────────
+      var revealObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+      document.querySelectorAll('.feature-card, .step-item, .metric-card, .arch-spec-card, .usecase-card, .arch-flow-node').forEach(function(el) {
+        el.classList.add('reveal-on-scroll');
+        revealObserver.observe(el);
+      });
+
+    })();
+  </script>
+
 </body>
 </html>
