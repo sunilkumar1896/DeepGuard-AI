@@ -7,6 +7,10 @@
  */
 
 const API_BASE = (() => {
+  // If custom backend is specified in localStorage or window
+  if (typeof window !== 'undefined' && (window.DEEPGUARD_BACKEND_URL || localStorage.getItem('deepguard_backend_url'))) {
+    return (window.DEEPGUARD_BACKEND_URL || localStorage.getItem('deepguard_backend_url')).replace(/\/+$/, '');
+  }
   // If running via file:/// protocol (e.g. double clicked index.html directly)
   if (typeof window !== 'undefined' && window.location.protocol === 'file:') {
     return 'http://127.0.0.1:8000';
@@ -14,6 +18,14 @@ const API_BASE = (() => {
   // If running on a standalone frontend dev server (e.g. Live Server on port 5500 or Vite on 5173 / 3000)
   if (typeof window !== 'undefined' && ['5500', '5173', '3000', '8080'].includes(window.location.port)) {
     return 'http://127.0.0.1:8000';
+  }
+  // If hosted on a static platform like Vercel, Netlify, or GitHub Pages:
+  if (typeof window !== 'undefined' && (
+      window.location.hostname.endsWith('vercel.app') ||
+      window.location.hostname.endsWith('netlify.app') ||
+      window.location.hostname.endsWith('github.io')
+  )) {
+    return 'https://deepguard-ai.onrender.com';
   }
   // When served by FastAPI, Docker, Render, Railway, Cloudflare, or localhost:8000:
   // window.location.origin dynamically points to the exact backend host

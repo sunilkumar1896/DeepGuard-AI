@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "public": false,
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/backend/static/$1"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "https://deepguard-ai.onrender.com/api/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/backend/static/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/backend/static/$1"
+    }
+  ]
+}
