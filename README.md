@@ -2,6 +2,9 @@
 
 > **Hybrid CNN–Transformer architecture** for detecting deepfakes in images and videos — trained entirely on our own models, no external detection APIs.
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/sunilkumar1896/DeepGuard-AI)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/sunilkumar1896/DeepGuard-AI)
+
 ---
 
 ## 🎯 Project Overview
