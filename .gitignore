@@ -24,6 +24,8 @@ env/
 # ── Data (raw datasets - too large for git) ───────────────────
 data/raw/
 data/processed/
+data/downloads/
+*.zip
 
 # ── Model Checkpoints (large binary files) ───────────────────
 checkpoints/

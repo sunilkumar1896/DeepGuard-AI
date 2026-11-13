@@ -1,0 +1,21 @@
+# ============================================================
+# DeepGuard AI — Production Runtime Dependencies
+# Optimized for Cloud Deployment (Render, Railway, Hugging Face, Docker)
+# ============================================================
+
+# Web & API Framework
+fastapi>=0.103.0
+uvicorn[standard]>=0.23.0
+python-multipart>=0.0.6
+aiofiles>=23.2.1
+pydantic>=2.4.0
+
+# Deep Learning (CPU Inference)
+torch>=2.1.0
+torchvision>=0.16.0
+
+# Image & Video Processing (Headless Linux Compatible)
+opencv-python-headless>=4.8.0.76
+Pillow>=10.0.0
+numpy>=1.24.0
+scipy>=1.11.0

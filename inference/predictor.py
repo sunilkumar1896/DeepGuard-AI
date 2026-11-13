@@ -96,7 +96,10 @@ class DeepfakePredictor:
 
         if checkpoint_path and os.path.exists(checkpoint_path):
             try:
-                state_dict = torch.load(checkpoint_path, map_location=self.device)
+                try:
+                    state_dict = torch.load(checkpoint_path, map_location=self.device, weights_only=False)
+                except TypeError:
+                    state_dict = torch.load(checkpoint_path, map_location=self.device)
                 if isinstance(state_dict, dict) and "model_state_dict" in state_dict:
                     model.load_state_dict(state_dict["model_state_dict"])
                 elif isinstance(state_dict, dict):
