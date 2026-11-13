@@ -34,3 +34,4 @@ EXPOSE 8000
 
 # Start server (binds to cloud provider's $PORT or default 8000)
 CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+

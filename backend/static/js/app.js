@@ -6,9 +6,19 @@
  * history management, and dashboard visualization.
  */
 
-const API_BASE = (window.location.protocol.startsWith('http') && window.location.port === '8000')
-  ? window.location.origin
-  : 'http://127.0.0.1:8000';
+const API_BASE = (() => {
+  // If running via file:/// protocol (e.g. double clicked index.html directly)
+  if (typeof window !== 'undefined' && window.location.protocol === 'file:') {
+    return 'http://127.0.0.1:8000';
+  }
+  // If running on a standalone frontend dev server (e.g. Live Server on port 5500 or Vite on 5173 / 3000)
+  if (typeof window !== 'undefined' && ['5500', '5173', '3000', '8080'].includes(window.location.port)) {
+    return 'http://127.0.0.1:8000';
+  }
+  // When served by FastAPI, Docker, Render, Railway, Cloudflare, or localhost:8000:
+  // window.location.origin dynamically points to the exact backend host
+  return (typeof window !== 'undefined' && window.location.origin) ? window.location.origin : 'http://127.0.0.1:8000';
+})();
 
 // ── State ──────────────────────────────────────────────────────
 const state = {

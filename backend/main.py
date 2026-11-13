@@ -100,9 +100,10 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Enable CORS for frontend applications
+# Enable CORS for frontend applications (supports localhost, dev servers, and cloud domains)
 app.add_middleware(
     CORSMiddleware,
+    allow_origin_regex=".*",
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
@@ -190,7 +191,7 @@ class ContactInquiryRequest(BaseModel):
 
 # ── Root & Health Endpoints ─────────────────────────────────────
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def read_root():
     html_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
     if os.path.exists(html_path):
@@ -203,7 +204,7 @@ def read_root():
     }
 
 
-@app.get("/api/v1/health")
+@app.api_route("/api/v1/health", methods=["GET", "HEAD"])
 def health_check():
     return {
         "status": "healthy",

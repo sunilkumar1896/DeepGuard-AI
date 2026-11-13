@@ -19,3 +19,4 @@ services:
         sync: false
       - key: SMTP_FROM
         value: "DeepGuard AI Security <pintukr735217@gmail.com>"
+
